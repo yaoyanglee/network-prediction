@@ -3,3 +3,4 @@ net-pred/
 MNIST/data/
 MNIST/mnistcnn/
 MNIST/synthetic_data/
+CNN_model/data/
