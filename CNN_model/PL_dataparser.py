@@ -25,7 +25,7 @@ class PLDataParser:
             biflowPacketData = biflow_data['packet_data']
             payload_length = biflowPacketData['L4_payload_bytes']
             # print(payload_length)
-            if len(payload_length) >= min_PL_count:
+            if len(payload_length) >= min_PL_count and len(payload_length) < 10000:
                 pl_data.extend(payload_length)
                 return pd.DataFrame({'PL': payload_length})
 
@@ -80,3 +80,18 @@ class PLDataParser:
 
     def get_minmax_scaler(self):
         return self.scaler
+
+    def create_sequences(self, data, input_window, output_window):
+        xs, ys = [], []
+
+        for i in range(len(data) - input_window - output_window + 1):
+            x = data[i:i+input_window]
+            y = data[i+input_window:i+input_window+output_window]
+            xs.append(x)
+            ys.append(y)
+
+        if len(xs) != len(ys):
+            raise Exception(
+                "Number of input data is not equal to the number of ground truth data")
+
+        return np.array(xs), np.array(ys)

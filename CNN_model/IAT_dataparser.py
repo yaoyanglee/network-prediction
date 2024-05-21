@@ -39,7 +39,7 @@ class IATDataParser:
             biflowPacketData = biflow_data['packet_data']
             biflowIAT = biflowPacketData['iat']  # Extract interarrival times
 
-            if len(biflowIAT) >= min_iat_count:
+            if len(biflowIAT) >= min_iat_count and len(biflowIAT) <= 10000:
                 iat_data.extend(biflowIAT)
                 return pd.DataFrame({'Interarrival': iat_data})
 
@@ -126,6 +126,8 @@ class IATDataParser:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         X_test_tensor = torch.tensor(X_test, dtype=torch.float32)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+
+        # print("X_train shape: ", X_test_tensor.size())
 
         # Create PyTorch dataset and dataloader
         train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
