@@ -12,6 +12,16 @@ from torch.utils.data import DataLoader, TensorDataset
 
 '''
 Main Class for managing the dataset
+
+Features for RFR:
+1. IAT 
+2. Raw payload (Equals to number of IAT in most cases, need to somehow encode the entire packet into some value)
+3. TCP Window Size (IAT and TCP window size always same) - Intuition is number of remaining frames to transmit?
+4. source port (Need to encode, eg. One hot encode)
+5. destination port (Need to encode, eg. One hot encode)
+6. packet direction
+7. IP Packet bytes
+8. L4 Payload Bytes
 '''
 
 
@@ -35,9 +45,30 @@ class IATDataParser:
         '''
 
         iat_data = []
+        print("Biflow packet data: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['packet_data'])
+        print('\n')
+        print("Biflow features: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_features'])
+        print('\n')
+        print("Biflow metadata: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_metadata'])
         for currentBiflow, biflow_data in self.biflow_data.items():
             biflowPacketData = biflow_data['packet_data']
+            biflowFlowFeatures = biflow_data['flow_features']
+            biflowFlowMetadata = biflow_data['flow_metadata']
             biflowIAT = biflowPacketData['iat']  # Extract interarrival times
+
+            if len(biflowIAT) != len(biflowPacketData['L4_raw_payload']):
+                print("IAT and payload length different number of elements")
+
+            # print("TCP_win_size: ", biflowPacketData['TCP_win_size'])
+            # print("len TCP_win_size: ", len(biflowPacketData['TCP_win_size']))
+            if len(biflowIAT) != len(biflowPacketData['TCP_win_size']):
+                print("IAT and TCP_win_size length different")
+
+            if len(biflowPacketData['IP_packet_bytes']) != len(biflowPacketData['L4_payload_bytes']):
+                print("IP_packet_bytes and L4_payload_bytes length different")
 
             if len(biflowIAT) >= min_iat_count and len(biflowIAT) <= 10000:
                 iat_data.extend(biflowIAT)
@@ -51,7 +82,7 @@ class IATDataParser:
 
         for currentBiflow, biflow_data in self.biflow_data.items():
             biflowPacketData = biflow_data['packet_data']
-
+            print()
             biflowIAT = biflowPacketData['iat']  # Extract interarrival times
 
             # Append interarrival times to the list
@@ -140,3 +171,13 @@ class IATDataParser:
             test_dataset, batch_size=batch_size, shuffle=True)
 
         return train_loader, test_loader
+
+
+# data_path = "../data/pcap/MIRAGE-COVID-CCMA-2022/Raw_JSON/Teams/1619005750_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+data_path = r"data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619005750_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+# Instantiate DataParser class
+iat_data_parser = IATDataParser(data_path)
+test_IAT = iat_data_parser.generate_debug_set()
+
+
+# print(test_IAT)
