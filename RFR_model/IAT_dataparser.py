@@ -33,7 +33,23 @@ class IATDataParser:
         with open(data_path, 'r') as file:
             self.biflow_data = json.load(file)
 
-    def generate_debug_set(self, min_iat_count=1000):
+    def find_all_debug_set(self, min_iat_count=2000):
+        iat_data = []
+
+        for currentBiflow, biflow_data in self.biflow_data.items():
+            biflowPacketData = biflow_data['packet_data']
+            biflowFlowFeatures = biflow_data['flow_features']
+            biflowFlowMetadata = biflow_data['flow_metadata']
+            biflowIAT = biflowPacketData['iat']  # Extract interarrival times
+
+            # and len(biflowIAT) <= 10000
+            if len(biflowIAT) >= min_iat_count and len(biflowIAT) <= 5000:
+                iat_data.append(biflowIAT)
+                return pd.DataFrame({'Interarrival': iat_data})
+
+        return iat_data
+
+    def generate_debug_set(self, min_iat_count=2000):
         '''
         Returns the first biflow dictionary with at least `min_iat_count` interarrival times (iat).
 
@@ -45,14 +61,16 @@ class IATDataParser:
         '''
 
         iat_data = []
-        print("Biflow packet data: ",
-              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['packet_data'])
-        print('\n')
-        print("Biflow features: ",
-              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_features'])
-        print('\n')
-        print("Biflow metadata: ",
-              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_metadata'])
+
+        # print("Biflow packet data: ",
+        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['packet_data'])
+        # print('\n')
+        # print("Biflow features: ",
+        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_features'])
+        # print('\n')
+        # print("Biflow metadata: ",
+        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_metadata'])
+
         for currentBiflow, biflow_data in self.biflow_data.items():
             biflowPacketData = biflow_data['packet_data']
             biflowFlowFeatures = biflow_data['flow_features']
@@ -70,11 +88,11 @@ class IATDataParser:
             if len(biflowPacketData['IP_packet_bytes']) != len(biflowPacketData['L4_payload_bytes']):
                 print("IP_packet_bytes and L4_payload_bytes length different")
 
-            if len(biflowIAT) >= min_iat_count and len(biflowIAT) <= 10000:
+            # and len(biflowIAT) <= 10000
+            if len(biflowIAT) >= min_iat_count and len(biflowIAT) <= 5000:
                 iat_data.extend(biflowIAT)
                 return pd.DataFrame({'Interarrival': iat_data})
 
-        print("No biflows with at least 1000 datapoints")
         return None
 
     def aggregate_IAT(self):  # Aggregate all biflows in this JSON file
@@ -173,11 +191,8 @@ class IATDataParser:
         return train_loader, test_loader
 
 
-# data_path = "../data/pcap/MIRAGE-COVID-CCMA-2022/Raw_JSON/Teams/1619005750_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
-data_path = r"data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619005750_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+data_path = r"C:\Users\yylee\OneDrive\Desktop\yylee\network-pred\network-prediction\data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619019338_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+
 # Instantiate DataParser class
 iat_data_parser = IATDataParser(data_path)
-test_IAT = iat_data_parser.generate_debug_set()
-
-
-# print(test_IAT)
+test_IAT = iat_data_parser.find_all_debug_set()
