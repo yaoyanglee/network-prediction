@@ -6,3 +6,7 @@ MNIST/synthetic_data/
 CNN_model/data/
 CNN_model/cnn_result_plots/
 CNN_model/__pycache__
+dataset_exploration/data_plots/
+dataset_exploration/data_plots_L4/
+dataset_exploration/saved_dataframes_L4/
+dataset_exploration/saved_dataframes/

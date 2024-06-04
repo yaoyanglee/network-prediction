@@ -62,14 +62,14 @@ class IATDataParser:
 
         iat_data = []
 
-        # print("Biflow packet data: ",
-        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['packet_data'])
-        # print('\n')
-        # print("Biflow features: ",
-        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_features'])
-        # print('\n')
-        # print("Biflow metadata: ",
-        #       self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_metadata'])
+        print("Biflow packet data: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['packet_data'])
+        print('\n')
+        print("Biflow features: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_features'])
+        print('\n')
+        print("Biflow metadata: ",
+              self.biflow_data['192.168.20.111,68,192.168.20.254,67,17']['flow_metadata'])
 
         for currentBiflow, biflow_data in self.biflow_data.items():
             biflowPacketData = biflow_data['packet_data']
@@ -191,8 +191,9 @@ class IATDataParser:
         return train_loader, test_loader
 
 
-data_path = r"C:\Users\yylee\OneDrive\Desktop\yylee\network-pred\network-prediction\data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619019338_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+# data_path = r"C:\Users\yylee\OneDrive\Desktop\yylee\network-pred\network-prediction\data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619019338_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json"
+data_path = r'C:\Users\yylee\OneDrive\Desktop\yylee\network-pred\network-prediction\data\MIRAGE\MIRAGE-COVID-CCMA-2022\Raw_JSON\Teams\Teams\1619005750_com.microsoft.teams_mirage2020dataset_labeled_biflows_all_packets_encryption_metadata.json'
 
 # Instantiate DataParser class
 iat_data_parser = IATDataParser(data_path)
-test_IAT = iat_data_parser.find_all_debug_set()
+test_IAT = iat_data_parser.generate_debug_set()
